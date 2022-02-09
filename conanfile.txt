@@ -4,6 +4,7 @@ boost/1.77.0
 spdlog/1.9.2
 fmt/8.0.1
 zeromq/4.3.4
+nlohmann_json/3.10.5
 
 [generators]
 cmake

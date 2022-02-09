@@ -3,8 +3,10 @@
 #include <fmt/format.h>
 #include <spdlog/spdlog.h>
 
+#include "exceptions_in_destructors.hpp"
+
 int main()
 {
-    spdlog::info(fmt::format("Current function: {}",BOOST_CURRENT_FUNCTION));
+    test_exceptions_in_destructors();
     return 0;
 }

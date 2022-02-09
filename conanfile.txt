@@ -1,0 +1,9 @@
+[requires]
+catch2/2.13.8
+boost/1.77.0
+spdlog/1.9.2
+fmt/8.0.1
+zeromq/4.3.4
+
+[generators]
+cmake

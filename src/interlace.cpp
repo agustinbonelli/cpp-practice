@@ -24,5 +24,49 @@ auto interlace(R1 rng1, R2 rng2,std::size_t hop1, size_t hop2);
 Which creates another range interlacing hop1 values of rng1 with hop2 values of rng2
 
 Using the already provided partition.
-
 */
+
+#include <catch2/catch.hpp>
+#include <spdlog/spdlog.h>
+#include <boost/range/adaptor/sliced.hpp>
+using namespace boost::adaptors;
+
+template<typename R1>
+struct Partitioned
+{
+    Partitioned(R1& r,std::size_t step) rng(r),m_step(step) {}
+
+    template<typename RANGE>
+    struct iterator
+    {
+        RANGE& rng;
+    }
+
+    iterator& begin(){}
+
+    iterator& end(){}
+
+    R1& rng;
+    std::size_t m_step
+}
+
+
+template<typename R1>
+auto partition(R1 rng1, std::size_t hop)
+{
+    return Partitioned<R1>(rng1,hop);
+}
+
+TEST_CASE("ItWorks","PartitionTest")
+{
+    std::vector<int> v{1,2,3,4,5,6,7,8,9};
+    int count=0;
+    for(auto p = partition(v,3))
+    {
+        spdlog::info("Printing range {}",count++);
+        for(auto item : p)
+        {
+            spdlog::info(item);
+        }
+    }
+}

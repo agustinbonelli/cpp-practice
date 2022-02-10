@@ -7,5 +7,8 @@ add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
-add_executable(cpppractice  src/main.cpp)
+add_executable(cpppractice  
+    src/main.cpp
+    src/exceptions_in_destructors.cpp
+)
 target_link_libraries(cpppractice ${CONAN_LIBS})

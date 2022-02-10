@@ -3,10 +3,5 @@
 #include <fmt/format.h>
 #include <spdlog/spdlog.h>
 
-#include "exceptions_in_destructors.hpp"
-
-int main()
-{
-    test_exceptions_in_destructors();
-    return 0;
-}
+#define CATCH_CONFIG_MAIN
+#include <catch2/catch.hpp>

@@ -28,45 +28,84 @@ Using the already provided partition.
 
 #include <catch2/catch.hpp>
 #include <spdlog/spdlog.h>
-#include <boost/range/adaptor/sliced.hpp>
-using namespace boost::adaptors;
+#include <range/v3/view.hpp>
 
-template<typename R1>
-struct Partitioned
+#include <boost/range/combine.hpp>
+
+#include <iostream>
+
+// Ranges_v3 split_when
+// int counter{0};
+
+// struct chunk_of
+// {
+//     chunk_of(int size = 1) : chunk_size(size){}
+
+//     template<typename I, typename S>
+//     std::pair<bool, I> operator()(I b, S) const
+//     {
+//         return { (counter++ % chunk_size) == 0, b};
+//     }
+//     int chunk_size;
+//     int& counter;
+// };
+
+template<typename RNG>
+auto split_in_chunks_of(RNG&& r,int k=1)
 {
-    Partitioned(R1& r,std::size_t step) rng(r),m_step(step) {}
-
-    template<typename RANGE>
-    struct iterator
-    {
-        RANGE& rng;
-    }
-
-    iterator& begin(){}
-
-    iterator& end(){}
-
-    R1& rng;
-    std::size_t m_step
+    return ranges::views::split_when(r,
+        [k,counter=0](auto b,auto s) mutable -> std::pair<bool, decltype(b)>
+        {
+            return { (counter++ % k) == 0, b};
+        }
+    );
 }
 
-
-template<typename R1>
-auto partition(R1 rng1, std::size_t hop)
+std::ostream& operator<<(std::ostream& os,std::vector<int> v)
 {
-    return Partitioned<R1>(rng1,hop);
+    os << "{";
+    for(auto item: v) { os << item << ',';}
+    os << "}";
+    return os;
 }
 
 TEST_CASE("ItWorks","PartitionTest")
 {
-    std::vector<int> v{1,2,3,4,5,6,7,8,9};
-    int count=0;
-    for(auto p = partition(v,3))
+    std::vector<int> v(20);
+    std::vector<int> v2(20);
+    std::iota(v.begin(),v.end(),0);
+    std::iota(v2.begin(),v2.end(),50);
+    int idx=0;
+
+    std::vector<int> result;
+
+    int k = 2;
+    auto chunks_1 = split_in_chunks_of(v,k);
+    auto chunks_2 = split_in_chunks_of(v2,k);
+    auto itx = chunks_1.begin();
+    auto ity = chunks_2.begin();
+    for(; itx != chunks_1.end() && ity != chunks_2.end(); ++itx, ++ity )
     {
-        spdlog::info("Printing range {}",count++);
-        for(auto item : p)
-        {
-            spdlog::info(item);
-        }
+        std::copy((*itx).begin(),(*itx).end(),std::back_inserter(result));
+        std::copy((*ity).begin(),(*ity).end(),std::back_inserter(result));
     }
+    for(;itx != chunks_1.end(); ++itx)
+    {
+        std::copy((*itx).begin(),(*itx).end(),std::back_inserter(result));
+    }
+    for(;ity != chunks_2.end(); ++ity)
+    {
+        std::copy((*ity).begin(),(*ity).end(),std::back_inserter(result));
+    }
+    
+    // for(auto p : split_in_chunks_of(v,2))
+    // {
+    //     spdlog::info("Printing range {}",idx++);
+    //     for(auto item : p)
+    //     {
+    //         spdlog::info(item);
+    //     }
+    // }
+
+    std::cout << result;
 }

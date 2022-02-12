@@ -10,5 +10,6 @@ conan_basic_setup()
 add_executable(cpppractice  
     src/main.cpp
     src/exceptions_in_destructors.cpp
+    src/interlace.cpp
 )
 target_link_libraries(cpppractice ${CONAN_LIBS})

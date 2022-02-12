@@ -29,27 +29,10 @@ Using the already provided partition.
 #include <catch2/catch.hpp>
 #include <spdlog/spdlog.h>
 #include <range/v3/view.hpp>
-
-#include <boost/range/combine.hpp>
-
+#include "pretty_print.hpp"
 #include <iostream>
 
-// Ranges_v3 split_when
-// int counter{0};
-
-// struct chunk_of
-// {
-//     chunk_of(int size = 1) : chunk_size(size){}
-
-//     template<typename I, typename S>
-//     std::pair<bool, I> operator()(I b, S) const
-//     {
-//         return { (counter++ % chunk_size) == 0, b};
-//     }
-//     int chunk_size;
-//     int& counter;
-// };
-
+// This was another possibility I explored before realizing that ranges had a chunk view
 template<typename RNG>
 auto split_in_chunks_of(RNG&& r,int k=1)
 {
@@ -61,51 +44,34 @@ auto split_in_chunks_of(RNG&& r,int k=1)
     );
 }
 
-std::ostream& operator<<(std::ostream& os,std::vector<int> v)
+TEST_CASE("chunk_and_zip","InterlaceTest")
 {
-    os << "{";
-    for(auto item: v) { os << item << ',';}
-    os << "}";
-    return os;
-}
+    using namespace ranges;
 
-TEST_CASE("ItWorks","PartitionTest")
-{
-    std::vector<int> v(20);
-    std::vector<int> v2(20);
-    std::iota(v.begin(),v.end(),0);
-    std::iota(v2.begin(),v2.end(),50);
+    std::vector<int> v1(10);
+    std::vector<int> v2(10);
+    std::generate(v1.begin(),v1.end(),[val=1]()mutable{return val++;});
+    std::generate(v2.begin(),v2.end(),[val=0]()mutable{return val+=10,val;});
     int idx=0;
-
     std::vector<int> result;
+    std::ostringstream ss;
+    ss << v1;
+    spdlog::info("v1 = {}",ss.str());
+    ss.str("");
+    ss.clear();
+    ss << v2;
+    spdlog::info("v2 = {}",ss.str());
 
-    int k = 2;
-    auto chunks_1 = split_in_chunks_of(v,k);
-    auto chunks_2 = split_in_chunks_of(v2,k);
-    auto itx = chunks_1.begin();
-    auto ity = chunks_2.begin();
-    for(; itx != chunks_1.end() && ity != chunks_2.end(); ++itx, ++ity )
+    
+    for(auto [rng1,rng2]: views::zip(v1 | views::chunk(2),v2 | views::chunk(2)))
     {
-        std::copy((*itx).begin(),(*itx).end(),std::back_inserter(result));
-        std::copy((*ity).begin(),(*ity).end(),std::back_inserter(result));
-    }
-    for(;itx != chunks_1.end(); ++itx)
-    {
-        std::copy((*itx).begin(),(*itx).end(),std::back_inserter(result));
-    }
-    for(;ity != chunks_2.end(); ++ity)
-    {
-        std::copy((*ity).begin(),(*ity).end(),std::back_inserter(result));
+        result.insert(result.end(),rng1.begin(),rng1.end());
+        result.insert(result.end(),rng2.begin(),rng2.end());
     }
     
-    // for(auto p : split_in_chunks_of(v,2))
-    // {
-    //     spdlog::info("Printing range {}",idx++);
-    //     for(auto item : p)
-    //     {
-    //         spdlog::info(item);
-    //     }
-    // }
-
-    std::cout << result;
+    ss.str("");
+    ss.clear();
+    ss << result;
+    spdlog::info("Interleaved result = {}",ss.str());
+    
 }

@@ -52,12 +52,13 @@ void test_exceptions_in_destructors(bool m_catch_ex)
     spdlog::info("It all went well");
 }
 
-TEST_CASE("Catching_in_destructor_does_not_terminate","Exceptions_in_destructors")
+TEST_CASE("Catching_in_destructor_does_not_terminate","[.hide]")
 {
-    // REQUIRE_NOTHROW(test_exceptions_in_destructors(true));
+    REQUIRE_NOTHROW(test_exceptions_in_destructors(true));
 }
 
-TEST_CASE("Not_Catching_in_destructor_calls_terminate","Exceptions_in_destructors")
+TEST_CASE("Not_Catching_in_destructor_calls_terminate","[.hide]")
 {
-    // REQUIRE_NOTHROW(test_exceptions_in_destructors(false));
+    //This will fail.
+    REQUIRE_NOTHROW(test_exceptions_in_destructors(false));
 }

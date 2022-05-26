@@ -82,7 +82,7 @@ std::vector<T> spiral_output(const std::vector<std::vector<T>>& matrix)
     return res;
 }
 
-TEST_CASE("spiral_iterator")
+TEST_CASE("spiral_iterator","[.hide]")
 {
     int dummy;
     std::vector<std::vector<T>> v = {
@@ -116,7 +116,7 @@ TEST_CASE("spiral_iterator")
 
 }
 
-TEST_CASE("SimpleCase")
+TEST_CASE("SimpleCase","[.hide]")
 {
     int dummy;
     std::ostringstream ss;
@@ -142,7 +142,7 @@ TEST_CASE("SimpleCase")
 
 }
 
-TEST_CASE("SpiralOutput")
+TEST_CASE("SpiralOutput","[.hide]")
 {
     std::vector<std::vector<T>> v = {
         { 1 , 2 , 3},
@@ -155,7 +155,7 @@ TEST_CASE("SpiralOutput")
     REQUIRE(vec == std::vector{1,2,3,4,5,6,7,8,9});
 }
 
-TEST_CASE("SpiralOutputomplex")
+TEST_CASE("SpiralOutputomplex","[.hide]")
 {
     std::vector<std::vector<T>> v = {
         { 1     , 2     , 3     , 4},

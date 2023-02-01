@@ -21,3 +21,4 @@ add_executable(cpppractice
 )
 target_compile_options(cpppractice PRIVATE --save-temps)
 target_link_libraries(cpppractice ${CONAN_LIBS})
+target_include_directories(cpppractice PRIVATE "/workspace/NamedType/include")

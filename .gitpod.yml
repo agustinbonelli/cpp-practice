@@ -8,7 +8,7 @@ gitConfig:
 # List the start up tasks. Learn more https://www.gitpod.io/docs/config-start-tasks/
 tasks:
   - name: Main
-    init: pip install conan
+    init: pip install conan=1.61.0
     command: conan --version
 
 vscode:

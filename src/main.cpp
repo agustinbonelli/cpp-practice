@@ -1,6 +1,7 @@
 #include <boost/current_function.hpp>
 #include <nlohmann/json.hpp>
 #include <fmt/format.h>
+#include <fmt/ostream.h>
 #include <spdlog/spdlog.h>
 #include <rxcpp/rx.hpp>
 
@@ -51,3 +52,31 @@ TEST_CASE("EmitedbyLambda")
         completedHandler);
 }
 
+TEST_CASE("ConcatMap")
+{
+    fmt::print("Main function On thread id {}\n",std::this_thread::get_id());
+    auto numbers = rxcpp::observable<>::range(0,10).concat_map(
+        [](int v){
+            std::vector<int> vec;
+            vec.reserve(v);
+            while(v > 0)
+            {
+                vec.push_back(v--);
+            };
+            fmt::print("Make Observable vector on thread id {}\n",std::this_thread::get_id());
+            return rxcpp::observable<>::iterate(vec);
+        },
+        [](int a, int b){
+            fmt::print("Make tuple ({},{}) on thread id {}\n",a,b,std::this_thread::get_id());
+            return std::make_tuple(a,b);
+        },
+        rxcpp::observe_on_new_thread()
+    );
+
+    numbers.as_blocking().subscribe([](const auto& t){
+        auto [a,b] = t;
+        fmt::print("On id {} --> {} : {}\n",std::this_thread::get_id(),a,b);
+    },
+    errorHandler,
+    completedHandler);
+}

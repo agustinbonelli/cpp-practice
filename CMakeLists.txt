@@ -4,6 +4,8 @@ project(CppPractice)
 add_definitions("-std=c++17")
 add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # add_compile_options(-fsanitize=address)
 add_compile_options(-fsanitize=thread)
 # add_link_options(-fsanitize=address)

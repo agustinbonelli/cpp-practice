@@ -14,13 +14,10 @@ add_link_options(-fsanitize=thread)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
-add_executable(cpppractice  
-    src/main.cpp
-    src/exceptions_in_destructors.cpp
-    src/interlace.cpp
-    src/spiral_iterator.cpp
-    src/shared_ptr/shared_ptr_test.cpp
-)
+set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+file(GLOB_RECURSE SOURCE_FILES ${SOURCE_DIR}/*.cpp ${SOURCE_DIR}/*.h)
+
+add_executable(cpppractice ${SOURCE_FILES})
 target_compile_options(cpppractice PRIVATE --save-temps)
 target_link_libraries(cpppractice ${CONAN_LIBS})
-target_include_directories(cpppractice PRIVATE "/workspace/NamedType/include")

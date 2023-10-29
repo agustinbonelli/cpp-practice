@@ -80,3 +80,84 @@ TEST_CASE("ConcatMap")
     errorHandler,
     completedHandler);
 }
+
+namespace
+{
+    template <typename T>
+    rxcpp::observable<std::shared_ptr<std::vector<T>>> zip_v(const std::vector<rxcpp::observable<T>>& observables) {
+        // map the first observable to convert values to a single-element vector
+        auto it = observables.cbegin();
+        rxcpp::observable<std::shared_ptr<std::vector<T>>> acc = it->map([](T t) {
+            return std::make_shared<std::vector<T>>(std::initializer_list<T>{ t });
+        });
+
+        // fold each observable into accumulator by zipping, and pushing back value
+        while (++it != observables.cend()) {
+            acc = acc.zip([](std::shared_ptr<std::vector<T>> acc, T next) { 
+                acc->push_back(next);
+                return acc;
+            }, *it);
+        }
+        return acc;
+    }
+
+    template<typename ValueType, template <typename,typename> class MapT,template<typename> class ContainerT>
+    using GraphImpl = MapT<ValueType,ContainerT<ValueType>;
+
+    using NodeValuetype = std::string;
+
+    using Graph = GraphImpl<NodeValuetype,std::unordered_map,std::vector>;
+
+    template<template<typename> class ContainerT>
+    using GraphLevelsImpl = ContainerT<ContainerT<NodeValuetype>>;
+
+    using GraphLevels = GraphLevelsImpl<std::vector>;
+
+    using ExecutionGraph=std::unordered_map<NodeValuetype,rxcpp::observable<NodeValuetype>>;
+
+    auto makeDagExecutionObservable(
+        const Graph& g,
+        const GraphLevels& levels,
+        std::function<void(NodeValuetype,std::vector<NodeValuetype>)> f)
+    {
+        ExecutionGraph execGraph;
+
+        for(const auto& level: levels)
+        {
+            for(const auto& node: level)
+            {
+                // Construct source obserbable in the map.
+                execGraph.emplace(
+                    node,
+                    rxcpp::obserbable<>::create<NodeValuetype>(
+                        [f,node,deps = g[node]](const subscriber<NodeValuetype>&){
+                            f(node,deps);
+                            s.on_next(node);
+                            s.on_completed();
+                        }
+                    )
+                );
+                // Zip it to aal its neighbours 
+            }   
+        }
+
+    }
+
+}
+
+TEST_CASE("DAGExecutionWithRx")
+{
+    /*
+    https://dreampuf.github.io/GraphvizOnline
+    digraph G {
+    a -> c;
+    b -> c;
+    a -> e;
+    d -> e;
+    c -> e;
+    c -> f;
+    f -> g;
+    e -> g;
+    }
+    */
+}
